@@ -1,18 +1,25 @@
 import smtplib
 import ssl
+import os
 from email.mime.text import MIMEText
 
 
 def send_mail(customer, dealer, rating, comments):
-    port = 465
-    smtp_server = 'smtp.gmail.com'
-    login = 'me_email@gmail.com'
+    if os.environ.get('DEBUG'):
+        env = os.environ.get
+    else:
+        from environs import Env
+        env = Env()
+        env.read_env()
+    port = env('PORT_EMAIL')
+    smtp_server = env('SMTP_EMAIL')
+    login = env('LOGIN_EMAIL')
     context = ssl.create_default_context()
-    password = ''
+    password = env('PASSWORD_EMAIL')
     message = f"<h3>New Feedback Submission</h3><ul><li>Customer: {customer}</li><li>Dealer: {dealer}</li>" \
               f"<li>Rating: {rating}</li><li>Comments: {comments}</li></ul>"
-    sender_email = 'your_email@gmail.com'
-    receiver_email = 'me_email@gmail.com'
+    sender_email = 'example@example.com'
+    receiver_email = env('LOGIN_EMAIL')
 
     msg = MIMEText(message, 'html')
     msg['Subject'] = 'Lexus Feedback'

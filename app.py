@@ -1,21 +1,21 @@
 import smtplib
-
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from send_mail import send_mail
+import os
 
 app = Flask(__name__)
 
-ENV = 'prod'
-
-if ENV == 'dev':
-    app.debug = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:johann@localhost/lexus'
+if os.environ.get('DEBUG'):
+    env = os.environ.get
 else:
-    app.debug = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ohigyxiizvmtlp:062469839551ffe7cfa7f0009d42184c9d24fba9c4de07acfe4d4b3e01285b73@ec2-54-160-120-28.compute-1.amazonaws.com:5432/d3ei88fina289f'
+    from environs import Env
+    env = Env()
+    env.read_env()
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.debug = env('DEBUG', default=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = env('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = env('SQLALCHEMY_TRACK_MODIFICATIONS', default=False)
 
 db = SQLAlchemy(app)
 
