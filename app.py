@@ -1,3 +1,5 @@
+import smtplib
+
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from send_mail import send_mail
@@ -52,7 +54,10 @@ def submit():
             data = Feedback(customer, dealer, rating, comments)
             db.session.add(data)
             db.session.commit()
-            send_mail(customer, dealer, rating, comments)
+            try:
+                send_mail(customer, dealer, rating, comments)
+            except smtplib.SMTPAuthenticationError:
+                pass
             return render_template('success.html')
         return render_template('index.html', message='You have already submit feedback!')
 
