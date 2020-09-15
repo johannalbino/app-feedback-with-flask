@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=johann
+      - POSTGRES_PASSWORD=johann
+      - POSTGRES_DB=lexus
+  web:
+    build: .
+    command: bash -c "alembic upgrade head && uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5433:80"
+    depends_on:
+      - postgres
